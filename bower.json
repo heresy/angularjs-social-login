@@ -1,6 +1,6 @@
 {
   "name": "angularjs-social-login",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "authors": [
     "Srinivas K <kpsrinivas@heresy.in>",
     "Jayaram K <kurapatijayaram@gmail.com>"
@@ -22,6 +22,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "^1.3.0"
+    "angular": "^1.3.0",
+    "angular-cookies": "^1.3.0"
   }
 }

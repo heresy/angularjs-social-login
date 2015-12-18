@@ -1,6 +1,6 @@
 "use strict";
 
-var socialLogin = angular.module('socialLogin', []);
+var socialLogin = angular.module('socialLogin', ['ngCookies']);
 
 socialLogin.run(function($window, $rootScope){
 	$window.googleSignInCallback = function(authResult){
@@ -74,6 +74,36 @@ socialLogin.provider("social", function(){
 	}
 });
 
+socialLogin.factory("socialLoginService", function($cookieStore, $rootScope){
+	return {
+		logout: function(){
+			var provider = $cookieStore.get('_login_provider');
+			switch(provider) {
+				case "google":
+					gapi.auth.signOut();
+					$cookieStore.remove('_login_provider');
+					$rootScope.$broadcast('event:social-sign-out-success', "success");
+					break;
+				case "linkedIn":
+					IN.User.logout(function(){
+						$cookieStore.remove('_login_provider');
+					 	$rootScope.$broadcast('event:social-sign-out-success', "success");
+					}, {});
+					break;
+				case "facebook"
+					FB.logout(function(res){
+						$cookieStore.remove('_login_provider');
+					 	$rootScope.$broadcast('event:social-sign-out-success', "success");
+					});
+					break;
+			}
+		},
+		setProviderCookie: function(provider){
+			$cookieStore.put('_login_provider', provider);
+		}
+	}
+});
+
 socialLogin.factory("fbService", function($q){
 	return {
 		login: function(){
@@ -97,7 +127,7 @@ socialLogin.factory("fbService", function($q){
 	}
 });
 
-socialLogin.directive("linkedIn", function($rootScope, social){
+socialLogin.directive("linkedIn", function($rootScope, social, socialLoginService){
 	return {
 		restrict: 'EA',
 		scope: {},
@@ -110,6 +140,7 @@ socialLogin.directive("linkedIn", function($rootScope, social){
 
 				IN.Event.on(IN, "auth", function(){
 					IN.API.Raw("/people/~:(id,first-name,last-name,email-address)").result(function(res){
+						socialLoginService.setProviderCookie("linkedIn");
 						var userDetails = {name: res.firstName + " " + res.lastName, email: res.emailAddress, uid: res.id, provider: "linkedIN"}
 						$rootScope.$broadcast('event:social-sign-in-success', userDetails);
 				    });
@@ -119,7 +150,7 @@ socialLogin.directive("linkedIn", function($rootScope, social){
 	}
 })
 
-socialLogin.directive("gLogin", function($rootScope, social){
+socialLogin.directive("gLogin", function($rootScope, social, socialLoginService){
 	return {
 		restrict: 'EA',
 		scope: {},
@@ -148,6 +179,7 @@ socialLogin.directive("gLogin", function($rootScope, social){
 					      	break;
 					      }
 					    }
+					    socialLoginService.setProviderCookie("google");
 					    var userDetails = {name: res.displayName, email: primaryEmail, uid: res.id, provider: "google"}
 					    $rootScope.$broadcast('event:social-sign-in-success', userDetails);
 					});
@@ -157,7 +189,7 @@ socialLogin.directive("gLogin", function($rootScope, social){
 	}
 });
 
-socialLogin.directive("fbLogin", function($rootScope, fbService, social){
+socialLogin.directive("fbLogin", function($rootScope, fbService, social, socialLoginService){
 	return {
 		restrict: 'A',
 		scope: {},
@@ -177,6 +209,7 @@ socialLogin.directive("fbLogin", function($rootScope, fbService, social){
 					fbService.login().then(function(res){
 						if(res.status == "connected"){
 							fbService.getUserDetails().then(function(res){
+								socialLoginService.setProviderCookie("linkedIn");
 								var userDetails = {email: res.email, uid: res.id, provider: "facebook"}
 								$rootScope.$broadcast('event:social-sign-in-success', userDetails);
 							}, function(err){
