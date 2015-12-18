@@ -90,7 +90,7 @@ socialLogin.factory("socialLoginService", function($cookieStore, $rootScope){
 					 	$rootScope.$broadcast('event:social-sign-out-success', "success");
 					}, {});
 					break;
-				case "facebook"
+				case "facebook":
 					FB.logout(function(res){
 						$cookieStore.remove('_login_provider');
 					 	$rootScope.$broadcast('event:social-sign-out-success', "success");
