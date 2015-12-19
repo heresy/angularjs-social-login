@@ -80,10 +80,24 @@ socialLogin.factory("socialLoginService", function($cookieStore, $rootScope){
 			var provider = $cookieStore.get('_login_provider');
 			switch(provider) {
 				case "google":
-					gapi.auth.signOut();
-					$cookieStore.remove('_login_provider');
-					$rootScope.$broadcast('event:social-sign-out-success', "success");
-					break;
+					//its a hack need to find better solution.
+					var gElement = document.getElementById("gSignout");
+					if (typeof(gElement) != 'undefined' && gElement != null)
+					{
+					  gElement.remove();
+					}
+					var d = document, gSignout, ref = d.getElementsByTagName('script')[0];
+					gSignout = d.createElement('script');
+					gSignout.src = "https://accounts.google.com/Logout";
+					gSignout.type = "text/javascript";
+					gSignout.id = "gSignout";
+					gSignout.onload = function() {
+						$cookieStore.remove('_login_provider');
+						$rootScope.$broadcast('event:social-sign-out-success', "success");
+			        };
+
+			        ref.parentNode.insertBefore(gSignout, ref);
+			        break;
 				case "linkedIn":
 					IN.User.logout(function(){
 						$cookieStore.remove('_login_provider');
