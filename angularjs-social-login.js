@@ -53,10 +53,11 @@ socialLogin.run(function($window, $rootScope){
 });
 
 socialLogin.provider("social", function(){
-	var fbKey, googleKey, linkedInKey;
+	var fbKey, fbApiV, googleKey, linkedInKey;
 	return {
-		setFbKey: function(value){
-			fbKey = value;
+		setFbKey: function(obj){
+			fbKey = obj.appId;
+			fbApiV = obj.apiVersion;
 		},
 		setGoogleKey: function(value){
 			googleKey = value;
@@ -68,7 +69,8 @@ socialLogin.provider("social", function(){
 			return{
 				fbKey: fbKey,
 				googleKey: googleKey,
-				linkedInKey: linkedInKey
+				linkedInKey: linkedInKey,
+				fbApiV: fbApiV
 			}
 		}
 	}
@@ -216,7 +218,7 @@ socialLogin.directive("fbLogin", function($rootScope, fbService, social, socialL
 					status: true, 
 					cookie: true, 
 					xfbml: true,
-					version: 'v2.4'
+					version: social.fbApiV
 				});
 
 				ele.on('click', function(){
