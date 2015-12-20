@@ -36,7 +36,7 @@ angular.module('myApp', ['socialLogin']);
 app.config(function(socialProvider){
 	socialProvider.setGoogleKey("YOUR GOOGLE CLIENT ID");
   socialProvider.setLinkedInKey("YOUR LINKEDIN CLIENT ID");
-  socialProvider.setFbKey("YOUR FACEBOOK APP ID");
+  socialProvider.setFbKey({appId: "YOUR FACEBOOK APP ID", apiVersion: "API VERSION"});
 });
 ```
 
