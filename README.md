@@ -1,5 +1,5 @@
 # AngularJS Social Login (socialLogin)
-AngularJS Social Login Module
+AngularJS Social Login Module is a simple client side authentication module which helps to authenticate your application using Google/Facebook/LinkedIN. It doesn't maintain any session, session between client application and server should be maintained by yourself after receiving user details from the provider.
 
 Supported sites:
 - Google
@@ -51,7 +51,12 @@ There are total three directives for handling Google, Facebook, LinkedIn authent
 - `socialProvider.setGoogleKey("YOUR GOOGLE CLIENT ID")`
 - `socialProvider.setLinkedInKey("YOUR LINKEDIN CLIENT ID")`
 - `socialProvider.setFbKey("YOUR FACEBOOK APP ID")`
-- `$rootScope.$on('event:social-sign-in-success', function(event, userDetails){})` (Braodcast event which is triggered after successful authentication)
+- `$rootScope.$on('event:social-sign-in-success', function(event, userDetails){})` 
+   Braodcast event which will be triggered after successful authentication. `userDetails` is an `Object` consists of `{name: <user_name>, email: <user_email>, uid: <UID by social vendor>, provider: <Google/Facebook/LinkedIN>}` 
+- `socialLoginService.logout()`
+   For logout
+- `$rootScope.$broadcast('event:social-sign-out-success', "success")`
+   Braodcast event which will be triggered after successful logout.
 
 ### Example
 ```html
