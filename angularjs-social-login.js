@@ -129,7 +129,7 @@ socialLogin.factory("fbService", function($q){
 		},
 		getUserDetails: function(){
 			var deferred = $q.defer();
-			FB.api('/me', function(res){
+			FB.api('/me?fields=name,email', function(res){
 				if(!res || res.error){
 					deferred.reject('Error occured while fetching user details.');
 				}else{
@@ -222,16 +222,16 @@ socialLogin.directive("fbLogin", function($rootScope, fbService, social, socialL
 				ele.on('click', function(){
 					fbService.login().then(function(res){
 						if(res.status == "connected"){
-							fbService.getUserDetails().then(function(res){
-								socialLoginService.setProviderCookie("linkedIn");
-								var userDetails = {email: res.email, uid: res.id, provider: "facebook"}
+							fbService.getUserDetails().then(function(user){
+								socialLoginService.setProviderCookie("facebook");
+								var userDetails = {name: user.name, email: user.email, uid: user.id, provider: "facebook"}
 								$rootScope.$broadcast('event:social-sign-in-success', userDetails);
 							}, function(err){
-
+								console.log(err);
 							})
 						}
 					}, function(err){
-
+						console.log(err);
 					});
 				});
 			});
