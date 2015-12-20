@@ -55,7 +55,7 @@ There are total three directives for handling Google, Facebook, LinkedIn authent
    Braodcast event which will be triggered after successful authentication. `userDetails` is an `Object` consists of `{name: <user_name>, email: <user_email>, uid: <UID by social vendor>, provider: <Google/Facebook/LinkedIN>}` 
 - `socialLoginService.logout()`
    For logout
-- `$rootScope.$broadcast('event:social-sign-out-success', "success")`
+- `$rootScope.$on('event:social-sign-out-success', function(event, logoutStatus){})`
    Braodcast event which will be triggered after successful logout.
 
 ### Example
