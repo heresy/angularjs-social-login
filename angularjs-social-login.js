@@ -3,14 +3,6 @@
 var socialLogin = angular.module('socialLogin', ['ngCookies']);
 
 socialLogin.run(function($window, $rootScope){
-	$window.googleSignInCallback = function(authResult){
-		if(authResult.status.signed_in && authResult.status.method == "PROMPT"){
-			$rootScope.$broadcast('event:google-sign-in-success', authResult);
-		}else{
-			console.log("User not authorised");
-		}
-	};
-
 	$rootScope.addLinkedInScript = function(apiKey){
 		var lIN, d = document, ref = d.getElementsByTagName('script')[0];
 		lIN = d.createElement('script');
@@ -42,7 +34,7 @@ socialLogin.run(function($window, $rootScope){
 		var d = document, gJs, ref = d.getElementsByTagName('script')[0];
 		gJs = d.createElement('script');
 		gJs.async = true;
-		gJs.src = "https://apis.google.com/js/client:platform.js"
+		gJs.src = "https://apis.google.com/js/platform.js"
 
 		gJs.onload = function() {
 			$rootScope.$broadcast('event:social-login-google-loaded', true);
@@ -172,35 +164,25 @@ socialLogin.directive("gLogin", function($rootScope, social, socialLoginService)
 		scope: {},
 		replace: true,
 		link: function(scope, ele, attr){
+			$rootScope.$on('event:social-login-google-loaded', function(event, status){
+				var params ={
+					client_id: social.googleKey,
+					scope: 'email'
+				}
+				gapi.load('auth2', function() {
+        			scope.gauth = gapi.auth2.init(params);
+      			});
+			    ele.on('click', function(){
+		        	scope.gauth.signIn().then(function(googleUser){
+		        		var profile = googleUser.getBasicProfile();
+		        		var idToken = googleUser.getAuthResponse().id_token
+		        		$rootScope.$broadcast('event:social-sign-in-success', {token: idToken, name: profile.getName(), email: profile.getEmail(), uid: profile.getId(), provider: "google"});
+		        	}, function(err){
+		        		console.log(err);
+		        	})
+		        });
+			});
 			$rootScope.addGoogleScript();
-			var params = {
-				clientid: social.googleKey,
-				cookiepolicy: "single_host_origin",
-				scope: 'email',
-				callback: "googleSignInCallback"
-			};
-	        ele.on('click', function(){
-	        	gapi.auth.signIn(params);
-			});
-
-			scope.$on('event:google-sign-in-success', function(event, authResult){
-				gapi.client.load('plus','v1', function(){
-					gapi.client.plus.people.get({
-						'userId': 'me'
-					}).execute(function(res){
-						var primaryEmail;
-					    for (var i=0; i < res.emails.length; i++) {
-					      if (res.emails[i].type === 'account'){
-					      	primaryEmail = res.emails[i].value;
-					      	break;
-					      }
-					    }
-					    socialLoginService.setProviderCookie("google");
-					    var userDetails = {name: res.displayName, email: primaryEmail, uid: res.id, provider: "google"}
-					    $rootScope.$broadcast('event:social-sign-in-success', userDetails);
-					});
-				});
-			});
 		}
 	}
 });
