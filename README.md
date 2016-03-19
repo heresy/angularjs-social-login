@@ -52,7 +52,7 @@ There are total three directives for handling Google, Facebook, LinkedIn authent
 - `socialProvider.setLinkedInKey("YOUR LINKEDIN CLIENT ID")`
 - `socialProvider.setFbKey("YOUR FACEBOOK APP ID")`
 - `$rootScope.$on('event:social-sign-in-success', function(event, userDetails){})` 
-   Braodcast event which will be triggered after successful authentication. `userDetails` is an `Object` consists of `{name: <user_name>, email: <user_email>, uid: <UID by social vendor>, provider: <Google/Facebook/LinkedIN>}` 
+   Braodcast event which will be triggered after successful authentication. `userDetails` is an `Object` consists of `{name: <user_name>, email: <user_email>, uid: <UID by social vendor>, provider: <Google/Facebook/LinkedIN>, token: <Google ID token (only for google)>}` 
 - `socialLoginService.logout()`
    For logout
 - `$rootScope.$on('event:social-sign-out-success', function(event, logoutStatus){})`
