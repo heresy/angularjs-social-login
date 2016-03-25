@@ -176,6 +176,7 @@ socialLogin.directive("gLogin", function($rootScope, social, socialLoginService)
 		        	scope.gauth.signIn().then(function(googleUser){
 		        		var profile = googleUser.getBasicProfile();
 		        		var idToken = googleUser.getAuthResponse().id_token
+		        		socialLoginService.setProviderCookie("google");
 		        		$rootScope.$broadcast('event:social-sign-in-success', {token: idToken, name: profile.getName(), email: profile.getEmail(), uid: profile.getId(), provider: "google"});
 		        	}, function(err){
 		        		console.log(err);
