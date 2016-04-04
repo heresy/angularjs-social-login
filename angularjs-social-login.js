@@ -173,6 +173,8 @@ socialLogin.directive("gLogin", function($rootScope, social, socialLoginService)
         			scope.gauth = gapi.auth2.init(params);
       			});
 			    ele.on('click', function(){
+			    	if(typeof(scope.gauth) == "undefined")
+			    		scope.gauth = gapi.auth2.getAuthInstance();	
 		        	scope.gauth.signIn().then(function(googleUser){
 		        		var profile = googleUser.getBasicProfile();
 		        		var idToken = googleUser.getAuthResponse().id_token
