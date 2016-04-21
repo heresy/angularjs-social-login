@@ -16,9 +16,10 @@ bower install angularjs-social-login --save
 
 ### configure installation
 
-Include JS file:
+Include JS files:
 
 ```html
+<script src="bower_components/angular-cookies/angular-cookies.js"></script>
 <script src="bower_components/angularjs-social-login/angularjs-social-login.js"></script>
 ```
 
