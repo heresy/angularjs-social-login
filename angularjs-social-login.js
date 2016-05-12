@@ -2,13 +2,9 @@
 
 var socialLogin = angular.module('socialLogin', ['ngCookies']);
 
-socialLogin.run(function($window, $rootScope){
-	
-});
-
 socialLogin.provider("social", function(){
 	var fbKey, fbApiV, googleKey, linkedInKey;
-	
+	var linkedInOptions = {};
 	return {
 		setFbKey: function(obj){
 			fbKey = obj.appId;
@@ -50,24 +46,30 @@ socialLogin.provider("social", function(){
 
 		    ref.parentNode.insertBefore(gJs, ref);
 		},
-		setLinkedInKey: function(value){
-			linkedInKey = value;
-			var lIN, d = document, ref = d.getElementsByTagName('script')[0];
-			lIN = d.createElement('script');
-			lIN.async = false;
-			lIN.src = "//platform.linkedin.com/in.js?async=false";
-			
-			lIN.onload = function() {
-				//$rootScope.$broadcast('event:social-login-linkedIn-loaded', true);
-			};
-			lIN.text = ("api_key: " + linkedInKey).replace("\"", "");
-	        ref.parentNode.insertBefore(lIN, ref);
+		setLinkedInKey: function(obj){
+			linkedInOptions.clientId = obj.clientId;
+			linkedInOptions.scope = obj.scope;
+			linkedInOptions.redirectUrl = obj.redirectUrl;
+			linkedInOptions.state = obj.state;
+			linkedInOptions.authType = obj.authType || ""; 
+			if(linkedInOptions.authType == "jsdk"){
+				var lIN, d = document, ref = d.getElementsByTagName('script')[0];
+				lIN = d.createElement('script');
+				lIN.async = false;
+				lIN.src = "//platform.linkedin.com/in.js?async=false";
+				
+				lIN.onload = function() {
+					//$rootScope.$broadcast('event:social-login-linkedIn-loaded', true);
+				};
+				lIN.text = ("api_key: " + linkedInOptions.clientId).replace("\"", "");
+		        ref.parentNode.insertBefore(lIN, ref);
+		    }
 		},
 		$get: function(){
 			return{
 				fbKey: fbKey,
 				googleKey: googleKey,
-				linkedInKey: linkedInKey,
+				linkedInOptions: linkedInOptions,
 				fbApiV: fbApiV
 			}
 		}
@@ -141,20 +143,24 @@ socialLogin.factory("fbService", function($q){
 	}
 });
 
-socialLogin.directive("linkedIn", function($rootScope, social, socialLoginService){
+socialLogin.directive("linkedIn", function($rootScope, social, socialLoginService, $window){
 	return {
 		restrict: 'EA',
 		scope: {},
 		link: function(scope, ele, attr){
 		    ele.on("click", function(){
-		  		IN.User.authorize(function(){
-					IN.API.Raw("/people/~:(id,first-name,last-name,email-address)").result(function(res){
-						socialLoginService.setProviderCookie("linkedIn");
-						var userDetails = {name: res.firstName + " " + res.lastName, email: res.emailAddress, uid: res.id, provider: "linkedIN"}
-						$rootScope.$broadcast('event:social-sign-in-success', userDetails);
-				    });
-				});
-			})
+		    	if(social.linkedInOptions.authType == "jsdk"){
+		    		IN.User.authorize(function(){
+						IN.API.Raw("/people/~:(id,first-name,last-name,email-address)").result(function(res){
+							socialLoginService.setProviderCookie("linkedIn");
+							var userDetails = {name: res.firstName + " " + res.lastName, email: res.emailAddress, uid: res.id, provider: "linkedIN"}
+							$rootScope.$broadcast('event:social-sign-in-success', userDetails);
+					    });
+					});
+		    	}else{
+		    		$window.location.href = "https://www.linkedin.com/uas/oauth2/authorization?response_type=code&client_id=" + social.linkedInOptions.clientId + "&redirect_uri=" + encodeURI(social.linkedInOptions.redirectUrl) + "&state=" + social.linkedInOptions.state + "&scope=" + social.linkedInOptions.scope;
+		    	}
+		    })
 		}
 	}
 })
