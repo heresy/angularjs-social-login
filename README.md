@@ -36,7 +36,11 @@ angular.module('myApp', ['socialLogin']);
 ```javascript
 app.config(function(socialProvider){
 	socialProvider.setGoogleKey("YOUR GOOGLE CLIENT ID");
-  socialProvider.setLinkedInKey("YOUR LINKEDIN CLIENT ID");
+  socialProvider.setLinkedInKey({clientId: "CLIENT ID", authType: "<jsdk OR oauth>", scope: "r_basicprofile,r_emailaddress", state: "STATE", redirectUrl: "http://localhost:9000/oauth/linked_in"});
+  //authType - 'jsdk' for static webpages where there is no backend, for simple authentication. 'oauth' for accessing various permissions from the user 
+  //state - some number which helps to prevent from CSRF attacks. It is must for 'oauth'
+  //redirectUrl - After successful authentication user will be redirected to this url.
+  //For more information https://developer.linkedin.com/docs/oauth2
   socialProvider.setFbKey({appId: "YOUR FACEBOOK APP ID", apiVersion: "API VERSION"});
 });
 ```
