@@ -7,7 +7,7 @@ Supported sites:
 - LinkedIN
 
 ## Installation
-**Note: v3.0.0 is in development mode. Please use our stable version v2.4.x**
+**Note: v3.0.0 is in development mode. Please use our stable version  [v2.4.4](https://github.com/heresy/angularjs-social-login/tree/v2.4.4)**
 ### via bower
 
 ```shell
