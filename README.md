@@ -7,7 +7,7 @@ Supported sites:
 - LinkedIN
 
 ## Installation
-
+**Note: v3.0.0 is in development mode. Please use our stable version v2.4.x**
 ### via bower
 
 ```shell
