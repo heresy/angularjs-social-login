@@ -129,7 +129,7 @@ socialLogin.factory("fbService", function($q){
 		},
 		getUserDetails: function(){
 			var deferred = $q.defer();
-			FB.api('/me?fields=name,email', function(res){
+			FB.api('/me?fields=name,email,picture', function(res){
 				if(!res || res.error){
 					deferred.reject('Error occured while fetching user details.');
 				}else{
@@ -148,9 +148,9 @@ socialLogin.directive("linkedIn", function($rootScope, social, socialLoginServic
 		link: function(scope, ele, attr){
 		    ele.on("click", function(){
 		  		IN.User.authorize(function(){
-					IN.API.Raw("/people/~:(id,first-name,last-name,email-address)").result(function(res){
+					IN.API.Raw("/people/~:(id,first-name,last-name,email-address,picture-url)").result(function(res){
 						socialLoginService.setProviderCookie("linkedIn");
-						var userDetails = {name: res.firstName + " " + res.lastName, email: res.emailAddress, uid: res.id, provider: "linkedIN"}
+						var userDetails = {name: res.firstName + " " + res.lastName, email: res.emailAddress, uid: res.id, provider: "linkedIN", imageUrl: res.pictureUrl};
 						$rootScope.$broadcast('event:social-sign-in-success', userDetails);
 				    });
 				});
@@ -172,7 +172,7 @@ socialLogin.directive("gLogin", function($rootScope, social, socialLoginService)
 	        		var profile = googleUser.getBasicProfile();
 	        		var idToken = googleUser.getAuthResponse().id_token
 	        		socialLoginService.setProviderCookie("google");
-	        		$rootScope.$broadcast('event:social-sign-in-success', {token: idToken, name: profile.getName(), email: profile.getEmail(), uid: profile.getId(), provider: "google"});
+	        		$rootScope.$broadcast('event:social-sign-in-success', {token: idToken, name: profile.getName(), email: profile.getEmail(), uid: profile.getId(), provider: "google", imageUrl: profile.getImageUrl()});
 	        	}, function(err){
 	        		console.log(err);
 	        	})
@@ -192,7 +192,7 @@ socialLogin.directive("fbLogin", function($rootScope, fbService, social, socialL
 					if(res.status == "connected"){
 						fbService.getUserDetails().then(function(user){
 							socialLoginService.setProviderCookie("facebook");
-							var userDetails = {name: user.name, email: user.email, uid: user.id, provider: "facebook"}
+							var userDetails = {name: user.name, email: user.email, uid: user.id, provider: "facebook", imageUrl: user.picture.data.url}
 							$rootScope.$broadcast('event:social-sign-in-success', userDetails);
 						}, function(err){
 							console.log(err);
