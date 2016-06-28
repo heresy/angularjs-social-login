@@ -1,6 +1,6 @@
 "use strict";
 
-var socialLogin = angular.module('socialLogin', ['ngCookies']);
+var socialLogin = angular.module('socialLogin', []);
 
 socialLogin.provider("social", function(){
 	var fbKey, fbApiV, googleKey, linkedInKey;
@@ -76,46 +76,34 @@ socialLogin.provider("social", function(){
 	}
 });
 
-socialLogin.factory("socialLoginService", function($cookieStore, $rootScope){
+socialLogin.factory("socialLoginService", function($window, $rootScope){
 	return {
 		logout: function(){
-			var provider = $cookieStore.get('_login_provider');
+			var provider = $window.localStorage.getItem('_login_provider');
 			switch(provider) {
 				case "google":
-					//its a hack need to find better solution.
-					var gElement = document.getElementById("gSignout");
-					if (typeof(gElement) != 'undefined' && gElement != null)
-					{
-					  gElement.remove();
-					}
-					var d = document, gSignout, ref = d.getElementsByTagName('script')[0];
-					gSignout = d.createElement('script');
-					gSignout.src = "https://accounts.google.com/Logout";
-					gSignout.type = "text/javascript";
-					gSignout.id = "gSignout";
-					gSignout.onload = function() {
-						$cookieStore.remove('_login_provider');
+					var auth2 = gapi.auth2.getAuthInstance();
+				    auth2.signOut().then(function () {
+				      	$window.localStorage.removeItem('_login_provider');
 						$rootScope.$broadcast('event:social-sign-out-success', "success");
-			        };
-
-			        ref.parentNode.insertBefore(gSignout, ref);
-			        break;
+				    });
+					break;
 				case "linkedIn":
 					IN.User.logout(function(){
-						$cookieStore.remove('_login_provider');
+						$window.localStorage.removeItem('_login_provider');
 					 	$rootScope.$broadcast('event:social-sign-out-success', "success");
 					}, {});
 					break;
 				case "facebook":
 					FB.logout(function(res){
-						$cookieStore.remove('_login_provider');
+						$window.localStorage.removeItem('_login_provider');
 					 	$rootScope.$broadcast('event:social-sign-out-success', "success");
 					});
 					break;
 			}
 		},
-		setProviderCookie: function(provider){
-			$cookieStore.put('_login_provider', provider);
+		setProvider: function(provider){
+			$window.localStorage.setItem('_login_provider', provider);
 		}
 	}
 });
@@ -131,7 +119,7 @@ socialLogin.factory("fbService", function($q){
 		},
 		getUserDetails: function(){
 			var deferred = $q.defer();
-			FB.api('/me?fields=name,email', function(res){
+			FB.api('/me?fields=name,email,picture', function(res){
 				if(!res || res.error){
 					deferred.reject('Error occured while fetching user details.');
 				}else{
@@ -149,18 +137,14 @@ socialLogin.directive("linkedIn", function($rootScope, social, socialLoginServic
 		scope: {},
 		link: function(scope, ele, attr){
 		    ele.on("click", function(){
-		    	if(social.linkedInOptions.authType == "jsdk"){
-		    		IN.User.authorize(function(){
-						IN.API.Raw("/people/~:(id,first-name,last-name,email-address)").result(function(res){
-							socialLoginService.setProviderCookie("linkedIn");
-							var userDetails = {name: res.firstName + " " + res.lastName, email: res.emailAddress, uid: res.id, provider: "linkedIN"}
-							$rootScope.$broadcast('event:social-sign-in-success', userDetails);
-					    });
-					});
-		    	}else{
-		    		$window.location.href = "https://www.linkedin.com/uas/oauth2/authorization?response_type=code&client_id=" + social.linkedInOptions.clientId + "&redirect_uri=" + encodeURI(social.linkedInOptions.redirectUrl) + "&state=" + social.linkedInOptions.state + "&scope=" + social.linkedInOptions.scope;
-		    	}
-		    })
+		  		IN.User.authorize(function(){
+					IN.API.Raw("/people/~:(id,first-name,last-name,email-address,picture-url)").result(function(res){
+						socialLoginService.setProvider("linkedIn");
+						var userDetails = {name: res.firstName + " " + res.lastName, email: res.emailAddress, uid: res.id, provider: "linkedIN", imageUrl: res.pictureUrl};
+						$rootScope.$broadcast('event:social-sign-in-success', userDetails);
+				    });
+				});
+			})
 		}
 	}
 })
@@ -177,8 +161,8 @@ socialLogin.directive("gLogin", function($rootScope, social, socialLoginService)
 	        	scope.gauth.signIn().then(function(googleUser){
 	        		var profile = googleUser.getBasicProfile();
 	        		var idToken = googleUser.getAuthResponse().id_token
-	        		socialLoginService.setProviderCookie("google");
-	        		$rootScope.$broadcast('event:social-sign-in-success', {token: idToken, name: profile.getName(), email: profile.getEmail(), uid: profile.getId(), provider: "google"});
+	        		socialLoginService.setProvider("google");
+	        		$rootScope.$broadcast('event:social-sign-in-success', {token: idToken, name: profile.getName(), email: profile.getEmail(), uid: profile.getId(), provider: "google", imageUrl: profile.getImageUrl()});
 	        	}, function(err){
 	        		console.log(err);
 	        	})
@@ -197,8 +181,8 @@ socialLogin.directive("fbLogin", function($rootScope, fbService, social, socialL
 				fbService.login().then(function(res){
 					if(res.status == "connected"){
 						fbService.getUserDetails().then(function(user){
-							socialLoginService.setProviderCookie("facebook");
-							var userDetails = {name: user.name, email: user.email, uid: user.id, provider: "facebook"}
+							socialLoginService.setProvider("facebook");
+							var userDetails = {name: user.name, email: user.email, uid: user.id, provider: "facebook", imageUrl: user.picture.data.url}
 							$rootScope.$broadcast('event:social-sign-in-success', userDetails);
 						}, function(err){
 							console.log(err);
