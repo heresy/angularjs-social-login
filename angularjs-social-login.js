@@ -4,7 +4,6 @@ var socialLogin = angular.module('socialLogin', []);
 
 socialLogin.provider("social", function(){
 	var fbKey, fbApiV, googleKey, linkedInKey;
-	var linkedInOptions = {};
 	return {
 		setFbKey: function(obj){
 			fbKey = obj.appId;
@@ -46,30 +45,20 @@ socialLogin.provider("social", function(){
 
 		    ref.parentNode.insertBefore(gJs, ref);
 		},
-		setLinkedInKey: function(obj){
-			linkedInOptions.clientId = obj.clientId;
-			linkedInOptions.scope = obj.scope;
-			linkedInOptions.redirectUrl = obj.redirectUrl;
-			linkedInOptions.state = obj.state;
-			linkedInOptions.authType = obj.authType || ""; 
-			if(linkedInOptions.authType == "jsdk"){
-				var lIN, d = document, ref = d.getElementsByTagName('script')[0];
-				lIN = d.createElement('script');
-				lIN.async = false;
-				lIN.src = "//platform.linkedin.com/in.js?async=false";
-				
-				lIN.onload = function() {
-					//$rootScope.$broadcast('event:social-login-linkedIn-loaded', true);
-				};
-				lIN.text = ("api_key: " + linkedInOptions.clientId).replace("\"", "");
-		        ref.parentNode.insertBefore(lIN, ref);
-		    }
-		},
+		setLinkedInKey: function(value){
+			linkedInKey = value;
+			var lIN, d = document, ref = d.getElementsByTagName('script')[0];
+			lIN = d.createElement('script');
+			lIN.async = false;
+			lIN.src = "//platform.linkedin.com/in.js?async=false";
+			lIN.text = ("api_key: " + linkedInKey).replace("\"", "");
+	        ref.parentNode.insertBefore(lIN, ref);
+	    },
 		$get: function(){
 			return{
 				fbKey: fbKey,
 				googleKey: googleKey,
-				linkedInOptions: linkedInOptions,
+				linkedInKey: linkedInKey,
 				fbApiV: fbApiV
 			}
 		}
@@ -82,12 +71,21 @@ socialLogin.factory("socialLoginService", function($window, $rootScope){
 			var provider = $window.localStorage.getItem('_login_provider');
 			switch(provider) {
 				case "google":
-					var auth2 = gapi.auth2.getAuthInstance();
-				    auth2.signOut().then(function () {
-				      	$window.localStorage.removeItem('_login_provider');
-						$rootScope.$broadcast('event:social-sign-out-success', "success");
-				    });
-					break;
+					//its a hack need to find better solution.
+					var gElement = document.getElementById("gSignout");
+					if (typeof(gElement) != 'undefined' && gElement != null)
+					{
+					  gElement.remove();
+					}
+					var d = document, gSignout, ref = d.getElementsByTagName('script')[0];
+					gSignout = d.createElement('script');
+					gSignout.src = "https://accounts.google.com/Logout";
+					gSignout.type = "text/javascript";
+					gSignout.id = "gSignout";
+					$window.localStorage.removeItem('_login_provider');
+					$rootScope.$broadcast('event:social-sign-out-success', "success");
+					ref.parentNode.insertBefore(gSignout, ref);
+			        break;
 				case "linkedIn":
 					IN.User.logout(function(){
 						$window.localStorage.removeItem('_login_provider');
