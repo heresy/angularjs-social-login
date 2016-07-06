@@ -1,0 +1,26 @@
+{
+  "name": "angularjs-social-login",
+  "version": "2.4.5",
+  "description": "Social Authentication for AngularJS application.",
+  "main": "angularjs-social-login.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heresy/angularjs-social-login.git"
+  },
+  "author": "Heresy Infotech Private Limited",
+  "contributors": [
+    {"name": "Srinivas K", "email": "kpsrinivas@heresy.in"},
+    {"name": "Jayaram Kurapati", "url": "https://www.jayaramk.in", "email": "reachme@jayaramk.in"}
+  ],
+  "dependencies": {
+    "angular": "^1.3.0"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/heresy/angularjs-social-login/issues"
+  },
+  "homepage": "https://github.com/heresy/angularjs-social-login#readme"
+}
