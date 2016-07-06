@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/heresy/angularjs-social-login.git"
+    "url": "git://github.com/heresy/angularjs-social-login.git"
   },
   "author": "Heresy Infotech Private Limited",
   "contributors": [
