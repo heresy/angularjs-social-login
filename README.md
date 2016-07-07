@@ -8,6 +8,12 @@ Supported sites:
 
 ## Installation
 
+### via npm
+
+```shell
+npm install angularjs-social-login --save
+```
+
 ### via bower
 
 ```shell
