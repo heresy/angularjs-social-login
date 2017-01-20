@@ -50,7 +50,7 @@ socialLogin.provider("social", function(){
 			var lIN, d = document, ref = d.getElementsByTagName('script')[0];
 			lIN = d.createElement('script');
 			lIN.async = false;
-			lIN.src = "//platform.linkedin.com/in.js?async=false";
+			lIN.src = "//platform.linkedin.com/in.js";
 			lIN.text = ("api_key: " + linkedInKey).replace("\"", "");
 	        ref.parentNode.insertBefore(lIN, ref);
 	    },
