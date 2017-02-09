@@ -192,4 +192,4 @@ socialLogin.directive("fbLogin", function($rootScope, fbService, social, socialL
 			});
 		}
 	}
-})
+});
