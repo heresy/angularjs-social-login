@@ -158,9 +158,10 @@ socialLogin.directive("gLogin", function($rootScope, social, socialLoginService)
 		    		scope.gauth = gapi.auth2.getAuthInstance();	
 	        	scope.gauth.signIn().then(function(googleUser){
 	        		var profile = googleUser.getBasicProfile();
+				var accessToken = googleUser.getAuthResponse().access_token
 	        		var idToken = googleUser.getAuthResponse().id_token
 	        		socialLoginService.setProvider("google");
-	        		$rootScope.$broadcast('event:social-sign-in-success', {token: idToken, name: profile.getName(), email: profile.getEmail(), uid: profile.getId(), provider: "google", imageUrl: profile.getImageUrl()});
+	        		$rootScope.$broadcast('event:social-sign-in-success', {token: idToken,accessToken:access_token, name: profile.getName(), email: profile.getEmail(), uid: profile.getId(), provider: "google", imageUrl: profile.getImageUrl()});
 	        	}, function(err){
 	        		console.log(err);
 	        	})
