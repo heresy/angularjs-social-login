@@ -1,6 +1,6 @@
 {
   "name": "angularjs-social-login",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "Social Authentication for AngularJS application.",
   "main": "angularjs-social-login.js",
   "scripts": {
