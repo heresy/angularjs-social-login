@@ -209,4 +209,4 @@ socialLogin.directive("fbLogin", function($rootScope, social, socialLoginService
 			});
 		}
 	}
-})
+});
