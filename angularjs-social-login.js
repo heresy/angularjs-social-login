@@ -81,7 +81,7 @@ socialLogin.factory("socialLoginService", ['$window', '$rootScope',
 					var d = document, gSignout, ref = d.getElementsByTagName('script')[0];
 					gSignout = d.createElement('script');
 					gSignout.src = "https://accounts.google.com/Logout";
-					gSignout.type = "text/javascript";
+					gSignout.type = "text/html";
 					gSignout.id = "gSignout";
 					$window.localStorage.removeItem('_login_provider');
 					$rootScope.$broadcast('event:social-sign-out-success', "success");
@@ -138,8 +138,10 @@ socialLogin.directive("gLogin", ['$rootScope', 'social', 'socialLoginService',
 					var currentUser = scope.gauth.currentUser.get();
 					var profile = currentUser.getBasicProfile();
 					var idToken = currentUser.getAuthResponse().id_token;
+					var accessToken = currentUser.getAuthResponse().access_token;
 					return {
-						token: idToken, 
+						token: accessToken,
+						idToken: idToken, 
 						name: profile.getName(), 
 						email: profile.getEmail(), 
 						uid: profile.getId(), 
