@@ -124,7 +124,7 @@ socialLogin.directive("linkedIn", ['$rootScope', 'social', 'socialLoginService',
 			})
 		}
 	}
-}])
+}]);
 
 socialLogin.directive("gLogin", ['$rootScope', 'social', 'socialLoginService',
 	function($rootScope, social, socialLoginService){
@@ -215,4 +215,4 @@ socialLogin.directive("fbLogin", ['$rootScope', 'social', 'socialLoginService', 
 			});
 		}
 	}
-}])
+}]);
