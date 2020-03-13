@@ -86,6 +86,11 @@ socialLogin.factory("socialLoginService", ['$window', '$rootScope',
 					$window.localStorage.removeItem('_login_provider');
 					$rootScope.$broadcast('event:social-sign-out-success', "success");
 					ref.parentNode.insertBefore(gSignout, ref);
+
+                    // enable users to sign out from the app without signing out of Google
+                    var auth2 = gapi.auth2.getAuthInstance();
+                    auth2.signOut();
+
 			        break;
 				case "linkedIn":
 					IN.User.logout(function(){
